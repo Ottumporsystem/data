@@ -2,70 +2,90 @@
 <html lang="km">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ប្រព័ន្ធឯកសាររួម</title>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; background: #f4f7f6; display: flex; flex-direction: column; height: 100vh; }
-        .header { background: white; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; }
-        .back-btn { padding: 8px 15px; background: #2c3e50; color: white; text-decoration: none; border-radius: 5px; font-size: 13px; }
+        body { font-family: 'Kantumruy Pro', sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: #fff; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .back-btn { padding: 8px 15px; background: #2c3e50; color: white; text-decoration: none; border-radius: 5px; font-size: 13px; font-weight: bold; }
         h1 { font-family: 'Moul', serif; color: #d35400; font-size: 16px; margin: 0; }
-        .upload-section { background: white; margin: 15px; padding: 20px; border-radius: 10px; border: 2px dashed #f39c12; text-align: center; }
-        .upload-btn { background: #f39c12; color: white; padding: 10px 20px; border-radius: 50px; cursor: pointer; display: inline-block; font-weight: bold; }
-        .list-area { flex: 1; overflow-y: auto; padding: 15px; }
-        .file-card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .btn-view { color: #3498db; text-decoration: none; font-weight: bold; margin-right: 15px; }
-        .btn-delete { color: #e74c3c; cursor: pointer; font-weight: bold; border: none; background: none; }
+        
+        .upload-card { background: white; margin: 15px; padding: 20px; border-radius: 12px; border: 2px dashed #f39c12; text-align: center; }
+        .upload-btn { background: #f39c12; color: white; padding: 12px 20px; border-radius: 50px; cursor: pointer; display: inline-block; font-weight: bold; font-size: 14px; }
+        #statusMsg { font-size: 12px; margin-top: 10px; color: #27ae60; font-weight: bold; }
+
+        .list-area { flex: 1; overflow-y: auto; padding: 10px; }
+        .file-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 5px solid #e74c3c; }
+        .file-info { flex: 1; margin-right: 10px; overflow: hidden; }
+        .file-name { font-weight: bold; font-size: 14px; color: #2c3e50; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; display: block; }
+        
+        .actions { display: flex; gap: 10px; }
+        .btn-view { background: #3498db; color: white; padding: 6px 12px; border-radius: 5px; text-decoration: none; font-size: 12px; font-weight: bold; }
+        .btn-delete { background: #ecf0f1; color: #e74c3c; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; border: none; }
+        .btn-delete:active { background: #fadbd8; }
     </style>
 </head>
 <body>
+
     <div class="header">
         <a href="index.html" class="back-btn">⬅ ថយក្រោយ</a>
         <h1>📁 ឯកសារ</h1>
     </div>
 
-    <div class="upload-section">
-        <label for="pdfIn" class="upload-btn">➕ បញ្ចូល PDF ទៅ Google Drive</label>
-        <input type="file" id="pdfIn" accept="application/pdf" style="display:none;">
-        <div id="upStatus" style="font-size: 12px; margin-top: 10px; color: #666;"></div>
+    <div class="upload-card">
+        <p style="margin-top:0; font-size: 13px; color: #666;">ជ្រើសរើសឯកសារ PDF ដើម្បីផ្ញើចូល Google Drive រួម</p>
+        <label for="fileInput" class="upload-btn">➕ Upload PDF ទៅ Drive</label>
+        <input type="file" id="fileInput" accept="application/pdf" style="display:none;">
+        <div id="statusMsg"></div>
     </div>
 
-    <div class="list-area" id="fileListView">
-        <p style="text-align:center;">កំពុងទាញទិន្នន័យ...</p>
+    <div class="list-area" id="pdfListView">
+        <p style="text-align:center; color:#999;">កំពុងទាញទិន្នន័យ...</p>
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbztsaSdNN42YRiPxfj0M0Iz3rVmuXf-2oMOC4e45yTiye24FUbH95nUpDXiB8lyc8GFZA/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwh8EPjjOS5LpyyfGaRxIrdnc2YKtCnbBQFqiA8YdO5nFa0wVP2YCzfBtYkVXGqPiU8Lg/exec';
 
-        // ១. ទាញបញ្ជី File ពី Google Sheets មកបង្ហាញ
+        // ១. មុខងារទាញបញ្ជី File មកបង្ហាញ
         async function loadFiles() {
-            const res = await fetch(scriptURL);
-            const data = await res.json();
-            const view = document.getElementById('fileListView');
-            
-            if (data.length <= 1) {
-                view.innerHTML = "<p style='text-align:center; color:#999;'>មិនទាន់មានឯកសាររួមឡើយ</p>";
-                return;
-            }
+            try {
+                const res = await fetch(scriptURL);
+                const data = await res.json();
+                const container = document.getElementById('pdfListView');
+                
+                if (data.length <= 1) {
+                    container.innerHTML = '<div style="text-align:center; margin-top:30px; color:#999;">មិនទាន់មានឯកសាររួមនៅឡើយទេ</div>';
+                    return;
+                }
 
-            view.innerHTML = data.slice(1).map((row, index) => `
-                <div class="file-card">
-                    <span style="font-size:14px; flex:1;">📄 ${row[0]}</span>
-                    <div>
-                        <a href="${row[1]}" target="_blank" class="btn-view">មើល</a>
-                        <span class="btn-delete" onclick="deleteFile(${index + 2})">លុប</span>
+                // បង្ហាញ File ពីក្រោមឡើងលើ (យកអាថ្មីដាក់លើ)
+                container.innerHTML = data.slice(1).map((row) => `
+                    <div class="file-card">
+                        <div class="file-info">
+                            <span class="file-name">📄 ${row[0]}</span>
+                            <small style="font-size:10px; color:#999;">${new Date(row[3]).toLocaleDateString()}</small>
+                        </div>
+                        <div class="actions">
+                            <a href="${row[1]}" target="_blank" class="btn-view">មើល</a>
+                            <button class="btn-delete" onclick="deleteFile('${row[2]}')">លុប</button>
+                        </div>
                     </div>
-                </div>
-            `).reverse().join('');
+                `).reverse().join('');
+            } catch (e) {
+                document.getElementById('pdfListView').innerHTML = '<p style="text-align:center; color:red;">កំហុសក្នុងការតភ្ជាប់!</p>';
+            }
         }
 
-        // ២. មុខងារ Upload ទៅ Google Drive តាមរយៈ Apps Script
-        document.getElementById('pdfIn').addEventListener('change', function(e) {
+        // ២. មុខងារ Upload
+        document.getElementById('fileInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
-            const status = document.getElementById('upStatus');
+            const status = document.getElementById('statusMsg');
             if (!file) return;
 
+            status.style.color = "#f39c12";
             status.innerHTML = "⏳ កំពុង Upload ទៅ Drive...";
+
             const reader = new FileReader();
             reader.onload = function(event) {
                 fetch(scriptURL, {
@@ -76,15 +96,48 @@
                     })
                 })
                 .then(res => res.json())
-                .then(response => {
-                    status.innerHTML = "✅ Upload ជោគជ័យ!";
-                    loadFiles();
+                .then(res => {
+                    if (res.status === "success") {
+                        status.style.color = "#27ae60";
+                        status.innerHTML = "✅ Upload ជោគជ័យ!";
+                        loadFiles();
+                    }
+                })
+                .catch(() => {
+                    status.style.color = "#e74c3c";
+                    status.innerHTML = "❌ បរាជ័យក្នុងការ Upload";
                 });
             };
             reader.readAsDataURL(file);
         });
 
-        loadFiles();
+        // ៣. មុខងារលុប
+        async function deleteFile(fileId) {
+            if (confirm("តើអ្នកពិតជាចង់លុបឯកសារនេះមែនទេ? សមាជិកទាំងអស់នឹងលែងឃើញទៀតហើយ។")) {
+                const status = document.getElementById('statusMsg');
+                status.style.color = "#e74c3c";
+                status.innerHTML = "⏳ កំពុងលុបចេញពី Drive និង Sheet...";
+
+                try {
+                    const response = await fetch(scriptURL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: "delete",
+                            fileId: fileId
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.status === "deleted") {
+                        status.innerHTML = "✅ លុបបានជោគជ័យ!";
+                        loadFiles();
+                    }
+                } catch (error) {
+                    alert("មិនអាចលុបបានទេ សូមព្យាយាមម្ដងទៀត!");
+                }
+            }
+        }
+
+        loadFiles(); // ចាប់ផ្ដើមទាញទិន្នន័យពេលបើកទំព័រ
     </script>
 </body>
 </html>
