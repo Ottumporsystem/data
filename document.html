@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>គ្រប់គ្រងឯកសារ PDF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
+    <style>
+        /* រៀបចំផ្ទៃអេក្រង់ */
+        html, body { height: 100%; margin: 0; overflow: hidden; background-color: #f4f7f6; display: flex; flex-direction: column; font-family: 'Kantumruy Pro', sans-serif; }
+        
+        /* របារខាងលើ */
+        .header { background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; display: flex; align-items: center; }
+        .back-btn { padding: 8px 15px; background: #2c3e50; color: white; text-decoration: none; border-radius: 5px; font-size: 13px; font-weight: bold; }
+        h1 { font-family: 'Moul', serif; color: #d35400; font-size: 16px; margin: 0; flex: 1; text-align: center; }
+
+        /* ផ្នែក Upload */
+        .upload-card { background: #fff; margin: 15px; padding: 25px; border-radius: 12px; border: 2px dashed #f39c12; text-align: center; }
+        .upload-label { background: #f39c12; color: white; padding: 12px 25px; border-radius: 50px; cursor: pointer; display: inline-block; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #fileInput { display: none; }
+        
+        /* ផ្នែកបញ្ជីឯកសារ */
+        .list-container { flex: 1; overflow-y: auto; padding: 0 15px 15px 15px; -webkit-overflow-scrolling: touch; }
+        .file-item { background: white; margin-bottom: 10px; padding: 15px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid #e74c3c; }
+        .file-info { display: flex; align-items: center; gap: 10px; }
+        .file-name { font-weight: bold; color: #2c3e50; font-size: 14px; }
+        .view-btn { background: #e74c3c; color: white; padding: 6px 15px; border-radius: 5px; text-decoration: none; font-size: 12px; font-weight: bold; }
+        
+        .empty-msg { text-align: center; color: #999; margin-top: 50px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="index.html" class="back-btn">⬅ ថយក្រោយ</a>
+        <h1>📁 ឯកសារ PDF របស់ខ្ញុំ</h1>
+    </div>
+
+    <div class="upload-card">
+        <p style="margin-top:0; color: #666; font-size: 14px;">ចុចប៊ូតុងខាងក្រោមដើម្បីជ្រើសរើស File PDF</p>
+        <label for="fileInput" class="upload-label">➕ ជ្រើសរើស PDF ដើម្បី Upload</label>
+        <input type="file" id="fileInput" accept="application/pdf">
+    </div>
+
+    <div class="list-container" id="pdfListView">
+        </div>
+
+    <script>
+        // ១. បង្កើតកន្លែងទុកទិន្នន័យបណ្តោះអាសន្ន (LocalStorage)
+        let myFiles = JSON.parse(localStorage.getItem('user_pdfs')) || [];
+
+        // ២. មុខងារបង្ហាញបញ្ជីឯកសារ
+        function displayFiles() {
+            const container = document.getElementById('pdfListView');
+            if (myFiles.length === 0) {
+                container.innerHTML = '<div class="empty-msg">មិនទាន់មានឯកសារនៅឡើយទេ...</div>';
+                return;
+            }
+
+            container.innerHTML = myFiles.map((file, index) => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <span style="font-size: 24px;">📄</span>
+                        <div class="file-name">${file.name}</div>
+                    </div>
+                    <a href="${file.data}" target="_blank" class="view-btn">មើល PDF</a>
+                </div>
+            `).reverse().join(''); // ដាក់ឯកសារថ្មីនៅខាងលើគេ
+        }
+
+        // ៣. មុខងារពេលអ្នកប្រើជ្រើសរើស File
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type === "application/pdf") {
+                const reader = new FileReader();
+                
+                // បំប្លែង File ទៅជាទិន្នន័យដែលអាចរក្សាទុកបាន (Base64)
+                reader.onload = function(event) {
+                    const newFile = {
+                        name: file.name,
+                        data: event.target.result, // នេះគឺជាកូដ PDF ទាំងមូល
+                        date: new Date().getTime()
+                    };
+                    
+                    myFiles.push(newFile);
+                    localStorage.setItem('user_pdfs', JSON.stringify(myFiles));
+                    displayFiles();
+                    alert("បានបញ្ចូលឯកសារ '" + file.name + "' ជោគជ័យ!");
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                alert("សូមជ្រើសរើសយកតែ File ជាប្រភេទ PDF ប៉ុណ្ណោះ!");
+            }
+        });
+
+        // ដំណើរការបង្ហាញ File ពេលបើកទំព័រដំបូង
+        displayFiles();
+    </script>
+</body>
+</html>
