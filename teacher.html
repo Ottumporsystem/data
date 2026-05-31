@@ -6,7 +6,6 @@
     <title>បញ្ជីព័ត៌មានគ្រូបង្រៀន - កំណែសម្រេច</title>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
     <style>
-        /* កំណត់អេក្រង់ឱ្យនៅនឹង (Disable Global Scroll) */
         html, body {
             height: 100%;
             margin: 0;
@@ -18,7 +17,6 @@
             font-family: 'Kantumruy Pro', sans-serif;
         }
 
-        /* ១. ផ្នែកខាងលើដែលនៅនឹងថ្កល់ (Top Bar) */
         .top-nav {
             background-color: white;
             padding: 15px 20px;
@@ -46,10 +44,9 @@
             margin: 0;
         }
 
-        /* ២. ផ្នែកតារាងដែលអាចអូសបាន (Internal Scroll Area) */
         .scroll-area {
-            flex: 1; /* យកផ្ទៃដែលសល់ទាំងអស់ */
-            overflow-y: auto; /* អូសចុះឡើងតែក្នុងផ្នែកនេះ */
+            flex: 1;
+            overflow-y: auto;
             padding: 10px;
             -webkit-overflow-scrolling: touch;
         }
@@ -62,36 +59,45 @@
         }
 
         .table-responsive {
-            overflow-x: auto; /* អូសឆ្វេងស្តាំ */
+            overflow-x: auto;
         }
 
         table { 
             width: 100%; 
             border-collapse: collapse; 
             min-width: 850px;
+            table-layout: auto; /* អនុញ្ញាតឱ្យតារាងលៃតម្រូវទទឹងតាមអក្សរ */
         }
         
-        /* ៣. ក្បាលតារាង (Sticky) - វានឹងឈប់នៅ Top: 0 នៃ scroll-area */
+        /* កែសម្រួលឱ្យទាញក្បាលតារាងបាន */
         thead th { 
             position: sticky;
             top: 0; 
             background-color: #f39c12; 
             color: black; 
-            padding: 15px 10px; 
+            padding: 10px; /* បន្ថយគម្លាត Padding */
             z-index: 100;
             border-bottom: 2px solid #e67e22;
+            border-right: 1px solid rgba(0,0,0,0.1);
             font-size: 14px;
+            white-space: nowrap; /* មិនឱ្យអក្សរធ្លាក់ជួរ */
+            
+            /* មុខងារទាញវែងខ្លី */
+            resize: horizontal;
+            overflow: auto;
         }
 
         tbody td { 
-            padding: 12px 10px; 
+            padding: 8px 10px; /* បន្ថយគម្លាតឱ្យមើលទៅឃើញទិន្នន័យបានច្រើន */
             border-bottom: 1px solid #eee; 
             text-align: center; 
             font-size: 14px; 
+            white-space: nowrap;
         }
 
         .name-cell { text-align: left; font-weight: bold; padding-left: 15px; color: #2c3e50; }
         tr:nth-child(even) { background-color: #fafafa; }
+        tr:hover { background-color: #f1f1f1; } /* បន្ថែម Highlight ពេលដាក់ Mouse លើ */
     </style>
 </head>
 <body>
@@ -107,13 +113,13 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>ល.រ</th>
-                            <th>ឈ្មោះគ្រូ</th>
-                            <th>ភេទ</th>
-                            <th>តួនាទី</th>
-                            <th>កាំប្រាក់</th>
-                            <th>លេខទូរស័ព្ទ</th>
-                            <th>ថ្ងៃចូលបម្រើ</th>
+                            <th style="width: 50px;">ល.រ</th>
+                            <th style="width: 200px;">ឈ្មោះគ្រូ</th>
+                            <th style="width: 70px;">ភេទ</th>
+                            <th style="width: 150px;">តួនាទី</th>
+                            <th style="width: 100px;">កាំប្រាក់</th>
+                            <th style="width: 130px;">លេខទូរស័ព្ទ</th>
+                            <th style="width: 130px;">ថ្ងៃចូលបម្រើ</th>
                         </tr>
                     </thead>
                     <tbody id="listData">
@@ -136,14 +142,16 @@
                 const rows = json.table.rows;
                 
                 let html = "";
-                rows.forEach((row, index) => {
+                
+                // ប្រើ .slice(1) ដើម្បីកាត់ជួរ Header (A1, B1...) ចោល
+                rows.slice(1).forEach((row, index) => {
                     if (row.c && row.c[1] && row.c[1].v) {
                         let phone = row.c[5] ? row.c[5].v.toString() : '-';
                         if (phone !== '-' && !phone.startsWith('0')) phone = '0' + phone;
 
                         html += `
                         <tr>
-                            <td>${row.c[0] ? row.c[0].v : (index + 1)}</td>
+                            <td>${index + 1}</td>
                             <td class="name-cell">${row.c[1].v}</td>
                             <td>${row.c[2] ? row.c[2].v : '-'}</td>
                             <td>${row.c[3] ? row.c[3].v : '-'}</td>
