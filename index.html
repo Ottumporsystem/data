@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ប្រព័ន្ធទិន្នន័យ</title>
 
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#d35400">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
 
     <style>
@@ -112,7 +118,7 @@
         .red { background-color: #ff4d4d !important; }
         .yellow { background-color: #f1c40f !important; color: #4b0082 !important; }
 
-        /* --- បន្ថែមថ្មី៖ រចនាផ្ទាំង Popup ដំណឹង --- */
+        /* --- ផ្ទាំង Popup ដំណឹង --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); z-index: 3000; justify-content: center; align-items: center;
@@ -145,6 +151,7 @@
         <a href="#">ថ្នាក់</a>
         <a href="https://docs.google.com/spreadsheets/d/1Js9S4F0SZn1pzwgjznk-ze8fWmDRy_HkmVKgnBDdOnE/edit?gid=393522210#gid=393522210">សិស្ស</a>
         <a href="javascript:void(0)" onclick="closeNav(); checkAnnouncement(true);">សេចក្ដីជូនដំណឹង</a>
+        <a href="javascript:void(0)" id="installBtn" style="display:none; color: #f1c40f;">📥 ដំឡើងកម្មវិធី</a>
     </div>
 
     <h1>ប្រព័ន្ធទិន្នន័យ</h1>
@@ -164,7 +171,36 @@
     </div>
 
     <script>
-        // --- ដាក់ Web App URL របស់អ្នកនៅទីនេះ ---
+        // --- ផ្នែកទី ១៖ PWA Configuration ---
+        // ចុះឈ្មោះ Service Worker (sw.js)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker បានចុះឈ្មោះ!'))
+                .catch(err => console.log('ចុះឈ្មោះបរាជ័យ:', err));
+            });
+        }
+
+        // មុខងារដំឡើងកម្មវិធី (Install Prompt)
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').style.display = 'block';
+        });
+
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    document.getElementById('installBtn').style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        // --- ផ្នែកទី ២៖ App Functions ---
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyRYSYSlF0ThVlX_TsQSe52_GhhLNez2ceDLAYaBT_uNtBMkCEIA-6StvvZfo3hOSCL9Q/exec';
 
         function openNav() {
@@ -174,16 +210,12 @@
             document.getElementById("mySidebar").style.width = "0";
         }
 
-        // មុខងារឆែកមើលដំណឹង
         async function checkAnnouncement(forceShow = false) {
             try {
                 const res = await fetch(scriptURL);
                 const data = await res.json();
-                
                 if (data.announcement && data.announcement.status === "ON") {
                     const currentMsg = data.announcement.msg;
-                    
-                    // បង្ហាញ Popup បើជាដំណឹងថ្មី ឬ បើអ្នកប្រើចុចមើលពី Sidebar (forceShow)
                     if (forceShow || localStorage.getItem('readNotice') !== currentMsg) {
                         document.getElementById('noteMessage').innerText = currentMsg;
                         document.getElementById('announcementModal').style.display = 'flex';
@@ -202,7 +234,6 @@
             document.getElementById('announcementModal').style.display = 'none';
         }
 
-        // ហៅឱ្យដំណើរការនៅពេលបើកទំព័រដំបូង
         window.onload = function() {
             checkAnnouncement();
         };
