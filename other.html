@@ -11,6 +11,7 @@
             font-family: 'Kantumruy Pro', sans-serif;
             margin: 0;
             padding-top: 80px;
+            padding-bottom: 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -48,30 +49,71 @@
             font-family: 'Moul', serif;
             color: #d35400;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
-        .container {
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 92%;
+            max-width: 1000px;
+        }
+
+        .column {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .column-title {
+            font-family: 'Moul', serif;
+            font-size: 16px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+            border-bottom: 2px solid #d35400;
+            padding-bottom: 5px;
+            width: 100%;
         }
 
         .btn {
-            width: 280px;
-            padding: 15px;
-            border-radius: 15px;
+            width: 90%;
+            padding: 12px 8px;
+            border-radius: 12px;
             text-decoration: none;
             font-weight: bold;
+            font-size: 14px;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
             color: white !important;
-            background-color: #2ecc71 !important;
+            word-break: break-word;
         }
 
+        /* ថ្នាក់ពណ៌ចម្រុះកំណត់តាម Sheet */
+        .blue { background-color: #007bff !important; }
+        .red { background-color: #ff4d4d !important; }
+        .yellow { background-color: #f1c40f !important; color: #333 !important; }
+        .green { background-color: #2ecc71 !important; }
+        .purple { background-color: #9b59b6 !important; }
+        .orange { background-color: #e67e22 !important; }
+
         .loading-text {
+            grid-column: span 3;
+            text-align: center;
             color: #7f8c8d;
             font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -83,39 +125,65 @@
 
     <h1>ការងារផ្សេងៗ</h1>
 
-    <!-- ទីតាំងបង្កើតប៊ូតុងដោយស្វ័យប្រវត្តិ -->
-    <div class="container" id="buttonContainer">
+    <div class="grid-container" id="gridContainer">
         <div class="loading-text">កំពុងទាញយកទិន្នន័យ...</div>
     </div>
 
     <script>
-        // 🔗 ដាក់ Web App URL របស់ Apps Script របស់អ្នកត្រង់នេះ
-        const fetchURL = 'https://script.google.com/macros/s/AKfycbwqNuNXkDDTnhbMUCX3QzNQohzq7I6_P4PO1ZTdJLau7if2JHA9_mUHCh-SFZ_IRrR7/exec';
+        const fetchURL = 'https://script.google.com/macros/s/AKfycbw6XnId-ngwtzSU-qDsdaTt_tLa9pw21Fl5gOVDiU-H1An45a5yXQbRUzNdFA254jZh/exec';
 
         async function loadDynamicButtons() {
-            const container = document.getElementById('buttonContainer');
+            const container = document.getElementById('gridContainer');
             try {
                 const response = await fetch(fetchURL);
-                const buttons = await response.json();
+                const data = await response.json();
 
-                // លុបសារ "កំពុងទាញយកទិន្នន័យ..." ចោល
                 container.innerHTML = '';
 
-                // បង្កើតប៊ូតុងតាមចំនួនជួរដែលមានក្នុង Google Sheet
-                buttons.forEach(btnData => {
-                    const aTag = document.createElement('a');
-                    aTag.href = btnData.link;
-                    aTag.className = 'btn';
-                    aTag.innerText = btnData.name;
-                    aTag.target = '_blank'; // បើក Link ក្នុង Tab ថ្មី
-                    container.appendChild(aTag);
+                const categories = [
+                    { title: 'ការងារដើមឆ្នាំ', list: data.startYear },
+                    { title: 'ការងារឆមាស', list: data.semester },
+                    { title: 'ការងារប្រចាំឆ្នាំ', list: data.fullYear }
+                ];
+
+                categories.forEach(cat => {
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'column';
+
+                    const titleDiv = document.createElement('div');
+                    titleDiv.className = 'column-title';
+                    titleDiv.innerText = cat.title;
+                    colDiv.appendChild(titleDiv);
+
+                    if (cat.list && cat.list.length > 0) {
+                        cat.list.forEach(btnData => {
+                            const aTag = document.createElement('a');
+                            aTag.href = btnData.link;
+                            
+                            // ដាក់ Class ពណ៌តាមទិន្នន័យ Column E ចេញពី Sheet
+                            const colorClass = btnData.color || 'green';
+                            aTag.className = `btn ${colorClass}`;
+                            
+                            aTag.innerText = btnData.name;
+                            aTag.target = '_blank';
+                            colDiv.appendChild(aTag);
+                        });
+                    } else {
+                        const emptyText = document.createElement('span');
+                        emptyText.style.color = '#95a5a6';
+                        emptyText.style.fontSize = '13px';
+                        emptyText.innerText = 'គ្មានទិន្នន័យ';
+                        colDiv.appendChild(emptyText);
+                    }
+
+                    container.appendChild(colDiv);
                 });
+
             } catch (error) {
-                container.innerHTML = '<div style="color:red;">មិនអាចទាញយកទិន្នន័យបានទេ!</div>';
+                container.innerHTML = '<div class="loading-text" style="color:red;">មិនអាចទាញយកទិន្នន័យបានទេ!</div>';
             }
         }
 
-        // ដំណើរការពេលបើកទំព័រ
         window.onload = loadDynamicButtons;
     </script>
 </body>
