@@ -382,8 +382,8 @@
             const pwd = document.getElementById('adminPwdInput').value;
             if (pwd === "School@123") {
                 closePwdModal();
-                window.open("https://docs.google.com/spreadsheets/d/1lLXrnqScWm5MZ7vY8H_4OHO8AiO5zkx0GAp031rJO_Y/edit?usp=sharing", "_blank");
-            } else {
+                window.location.href = "https://docs.google.com/spreadsheets/d/1lLXrnqScWm5MZ7vY8H_4OHO8AiO5zkx0GAp031rJO_Y/edit?usp=sharing";
+    } else {
                 alert("លេខកូដសម្ងាត់មិនត្រឹមត្រូវទេ! សូមសាកល្បងម្ដងទៀត។");
             }
         }
