@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ផ្ទាំងគ្រប់គ្រង</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Kantumruy Pro', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .header-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: white;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .back-btn {
+            text-decoration: none;
+            color: #d35400;
+            font-weight: bold;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .iframe-container {
+            width: 100%;
+            height: calc(100% - 50px);
+            margin-top: 50px;
+            position: relative;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-bar">
+        <a href="index.html" class="back-btn">⬅ ត្រឡប់ក្រោយ</a>
+    </div>
+
+    <div class="iframe-container">
+        <!-- ដាក់ Link Edit Google Sheets ដែលអាចកែសម្រួលបានធម្មតា -->
+        <iframe src="https://docs.google.com/spreadsheets/d/1lLXrnqScWm5MZ7vY8H_4OHO8AiO5zkx0GAp031rJO_Y/edit?usp=sharing"></iframe>
+    </div>
+
+</body>
+</html>
