@@ -113,6 +113,7 @@
             text-align: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             color: white !important;
+            cursor: pointer;
         }
         .blue { background-color: #007bff !important; }
         .red { background-color: #ff4d4d !important; }
@@ -158,7 +159,8 @@
     <h1>ប្រព័ន្ធទិន្នន័យ</h1>
 
     <div class="container">
-        <a href="https://docs.google.com/spreadsheets/d/1afgroyCJS3lyFvee03zl2uGAsKHhO2PNJSKrb_Rguvs/edit?usp=sharing" class="btn blue">សិស្សធ្វើកិច្ចការស្រាវជ្រាវ</a>
+        <!-- ប្ដូរទៅជាប៊ូតុង ផ្ទាំងគ្រប់គ្រង + ភ្ជាប់អនុគមន៍ការពារដោយ Password -->
+        <a href="javascript:void(0)" onclick="openAdminSheet()" class="btn blue">ផ្ទាំងគ្រប់គ្រង</a>
         <a href="https://docs.google.com/spreadsheets/u/0/d/1tGn2xgAk-zKGIrPA4lyDw1ssVu57e22t4UJkcqTnKxQ/edit" class="btn red">អត្តលេខសិស្ស</a>
         <a href="https://docs.google.com/spreadsheets/d/1PnwL3ZsdLLCKjK5jm9MwPw0Du35MfOXMd1qELAdPIb0/edit?usp=drivesdk" class="btn yellow">របាយការណ៍ស្ដង់ដាគំរូ</a>
         <a href="other.html" class="btn green">ការងារផ្សេងៗ</a>
@@ -174,7 +176,6 @@
 
     <script>
         // --- ផ្នែកទី ១៖ PWA Configuration ---
-        // ចុះឈ្មោះ Service Worker (sw.js)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('sw.js')
@@ -183,7 +184,6 @@
             });
         }
 
-        // មុខងារដំឡើងកម្មវិធី (Install Prompt)
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -210,6 +210,16 @@
         }
         function closeNav() {
             document.getElementById("mySidebar").style.width = "0";
+        }
+
+        // អនុគមន៍ផ្ទៀងផ្ទាត់លេខកូដសម្ងាត់សម្រាប់ "ផ្ទាំងគ្រប់គ្រង"
+        function openAdminSheet() {
+            const password = prompt("សូមវាយបញ្ចូលលេខកូដសម្ងាត់ដើម្បីចូលទៅកាន់ផ្ទាំងគ្រប់គ្រង៖");
+            if (password === "School@123") {
+                window.open("https://docs.google.com/spreadsheets/d/1lLXrnqScWm5MZ7vY8H_4OHO8AiO5zkx0GAp031rJO_Y/edit?usp=sharing", "_blank");
+            } else if (password !== null) {
+                alert("លេខកូដសម្ងាត់មិនត្រឹមត្រូវទេ! សូមសាកល្បងម្ដងទៀត។");
+            }
         }
 
         async function checkAnnouncement(forceShow = false) {
