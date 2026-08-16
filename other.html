@@ -165,7 +165,9 @@
                             aTag.className = `btn ${colorClass}`;
                             
                             aTag.innerText = btnData.name;
-                            aTag.target = '_blank';
+                            
+                            // បានលុប aTag.target = '_blank'; ចេញ ដើម្បីឱ្យបើកក្នុង App ផ្ទាល់
+                            
                             colDiv.appendChild(aTag);
                         });
                     } else {
