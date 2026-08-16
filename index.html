@@ -134,7 +134,7 @@
         .modal-box p { font-size: 15px; color: #333; line-height: 1.7; margin: 20px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 15px 0; }
         .close-btn { background: #f39c12; color: white; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%; font-size: 14px; }
 
-        /* --- ផ្ទាំង Popup លេខកូដសម្ងាត់ (Custom Password Modal) --- */
+        /* --- ផ្ទាំង Popup លេខកូដសម្ងាត់ (Password Modal) --- */
         .pwd-modal-overlay {
             display: none;
             position: fixed;
@@ -182,22 +182,44 @@
             line-height: 1.5;
         }
 
+        /* ប្រអប់ wrapper សម្រាប់ដាក់ Input និង Icon ភ្នែក */
+        .pwd-input-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
         .pwd-input {
-            width: 90%;
-            padding: 12px;
+            width: 100%;
+            padding: 12px 40px 12px 15px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 15px;
             text-align: center;
             outline: none;
             transition: 0.3s;
-            margin-bottom: 20px;
             box-sizing: border-box;
         }
 
         .pwd-input:focus {
             border-color: #007bff;
             box-shadow: 0 0 8px rgba(0,123,255,0.25);
+        }
+
+        .toggle-pwd-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+            opacity: 0.6;
+            transition: 0.2s;
+        }
+
+        .toggle-pwd-btn:hover {
+            opacity: 1;
         }
 
         .pwd-btn-group {
@@ -274,13 +296,18 @@
         </div>
     </div>
 
-    <!-- ផ្ទាំង Popup វាយបញ្ចូលលេខកូដសម្ងាត់ (ស្អាតទំនើប) -->
+    <!-- ផ្ទាំង Popup វាយបញ្ចូលលេខកូដសម្ងាត់ (មាន Icon ភ្នែកមើល/លាក់ Password) -->
     <div id="passwordModal" class="pwd-modal-overlay">
         <div class="pwd-modal-box">
             <div class="pwd-icon">🔒</div>
             <h3>ការការពារសុវត្ថិភាព</h3>
             <p>សូមវាយបញ្ចូលលេខកូដសម្ងាត់ដើម្បីចូលទៅកាន់ផ្ទាំងគ្រប់គ្រង</p>
-            <input type="password" id="adminPwdInput" class="pwd-input" placeholder="បញ្ចូលលេខកូដទីនេះ..." onkeydown="if(event.key==='Enter') submitPassword()">
+            
+            <div class="pwd-input-wrapper">
+                <input type="password" id="adminPwdInput" class="pwd-input" placeholder="បញ្ចូលលេខកូដទីនេះ..." onkeydown="if(event.key==='Enter') submitPassword()">
+                <span class="toggle-pwd-btn" onclick="togglePasswordVisibility()">👁️</span>
+            </div>
+
             <div class="pwd-btn-group">
                 <button class="pwd-btn pwd-btn-cancel" onclick="closePwdModal()">បោះបង់</button>
                 <button class="pwd-btn pwd-btn-submit" onclick="submitPassword()">បញ្ជូន</button>
@@ -328,15 +355,27 @@
 
         // --- មុខងារផ្ទាំង Popup លេខកូដសម្ងាត់ ---
         function openAdminSheet() {
-            document.getElementById('adminPwdInput').value = '';
+            const pwdInput = document.getElementById('adminPwdInput');
+            pwdInput.value = '';
+            pwdInput.type = 'password'; // កំណត់ទៅជាលាក់វិញរាល់ពេលបើកដំបូង
             document.getElementById('passwordModal').style.display = 'flex';
             setTimeout(() => {
-                document.getElementById('adminPwdInput').focus();
+                pwdInput.focus();
             }, 100);
         }
 
         function closePwdModal() {
             document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        // មុខងារ បិទ/បើក មើលលេខកូដសម្ងាត់
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('adminPwdInput');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+            } else {
+                pwdInput.type = 'password';
+            }
         }
 
         function submitPassword() {
