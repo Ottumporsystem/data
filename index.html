@@ -133,6 +133,106 @@
         .modal-box h2 { font-family: 'Moul', serif; color: #d35400; font-size: 18px; margin-top: 0; }
         .modal-box p { font-size: 15px; color: #333; line-height: 1.7; margin: 20px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 15px 0; }
         .close-btn { background: #f39c12; color: white; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%; font-size: 14px; }
+
+        /* --- ផ្ទាំង Popup លេខកូដសម្ងាត់ (Custom Password Modal) --- */
+        .pwd-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 4000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pwd-modal-box {
+            background: white;
+            width: 85%;
+            max-width: 340px;
+            padding: 25px 20px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: pwdPopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pwdPopIn {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .pwd-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .pwd-modal-box h3 {
+            font-family: 'Moul', serif;
+            color: #d35400;
+            font-size: 16px;
+            margin: 0 0 10px 0;
+        }
+
+        .pwd-modal-box p {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .pwd-input {
+            width: 90%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .pwd-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0,123,255,0.25);
+        }
+
+        .pwd-btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .pwd-btn {
+            flex: 1;
+            padding: 11px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .pwd-btn-submit {
+            background: #007bff;
+            color: white;
+        }
+
+        .pwd-btn-submit:hover {
+            background: #0056b3;
+        }
+
+        .pwd-btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .pwd-btn-cancel:hover {
+            background: #d4d4d4;
+        }
     </style>
 </head>
 <body>
@@ -159,18 +259,32 @@
     <h1>ប្រព័ន្ធទិន្នន័យ</h1>
 
     <div class="container">
-        <!-- ប្ដូរទៅជាប៊ូតុង ផ្ទាំងគ្រប់គ្រង + ភ្ជាប់អនុគមន៍ការពារដោយ Password -->
         <a href="javascript:void(0)" onclick="openAdminSheet()" class="btn blue">ផ្ទាំងគ្រប់គ្រង</a>
         <a href="https://docs.google.com/spreadsheets/u/0/d/1tGn2xgAk-zKGIrPA4lyDw1ssVu57e22t4UJkcqTnKxQ/edit" class="btn red">អត្តលេខសិស្ស</a>
         <a href="https://docs.google.com/spreadsheets/d/1PnwL3ZsdLLCKjK5jm9MwPw0Du35MfOXMd1qELAdPIb0/edit?usp=drivesdk" class="btn yellow">របាយការណ៍ស្ដង់ដាគំរូ</a>
         <a href="other.html" class="btn green">ការងារផ្សេងៗ</a>
     </div>
 
+    <!-- ផ្ទាំង Popup ដំណឹង -->
     <div id="announcementModal" class="modal-overlay">
         <div class="modal-box">
             <h2>📢 ដំណឹងថ្មីៗ!</h2>
             <p id="noteMessage">កំពុងទាញយកដំណឹង...</p>
             <button class="close-btn" onclick="closeModal()">យល់ព្រម / ទទួលជ្រាប</button>
+        </div>
+    </div>
+
+    <!-- ផ្ទាំង Popup វាយបញ្ចូលលេខកូដសម្ងាត់ (ស្អាតទំនើប) -->
+    <div id="passwordModal" class="pwd-modal-overlay">
+        <div class="pwd-modal-box">
+            <div class="pwd-icon">🔒</div>
+            <h3>ការការពារសុវត្ថិភាព</h3>
+            <p>សូមវាយបញ្ចូលលេខកូដសម្ងាត់ដើម្បីចូលទៅកាន់ផ្ទាំងគ្រប់គ្រង</p>
+            <input type="password" id="adminPwdInput" class="pwd-input" placeholder="បញ្ចូលលេខកូដទីនេះ..." onkeydown="if(event.key==='Enter') submitPassword()">
+            <div class="pwd-btn-group">
+                <button class="pwd-btn pwd-btn-cancel" onclick="closePwdModal()">បោះបង់</button>
+                <button class="pwd-btn pwd-btn-submit" onclick="submitPassword()">បញ្ជូន</button>
+            </div>
         </div>
     </div>
 
@@ -212,12 +326,25 @@
             document.getElementById("mySidebar").style.width = "0";
         }
 
-        // អនុគមន៍ផ្ទៀងផ្ទាត់លេខកូដសម្ងាត់សម្រាប់ "ផ្ទាំងគ្រប់គ្រង"
+        // --- មុខងារផ្ទាំង Popup លេខកូដសម្ងាត់ ---
         function openAdminSheet() {
-            const password = prompt("សូមវាយបញ្ចូលលេខកូដសម្ងាត់ដើម្បីចូលទៅកាន់ផ្ទាំងគ្រប់គ្រង៖");
-            if (password === "School@123") {
+            document.getElementById('adminPwdInput').value = '';
+            document.getElementById('passwordModal').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('adminPwdInput').focus();
+            }, 100);
+        }
+
+        function closePwdModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        function submitPassword() {
+            const pwd = document.getElementById('adminPwdInput').value;
+            if (pwd === "School@123") {
+                closePwdModal();
                 window.open("https://docs.google.com/spreadsheets/d/1lLXrnqScWm5MZ7vY8H_4OHO8AiO5zkx0GAp031rJO_Y/edit?usp=sharing", "_blank");
-            } else if (password !== null) {
+            } else {
                 alert("លេខកូដសម្ងាត់មិនត្រឹមត្រូវទេ! សូមសាកល្បងម្ដងទៀត។");
             }
         }
